@@ -1,13 +1,10 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:dev.sqlite"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Session {
@@ -19,4 +16,33 @@ model Session {
   expires     DateTime?
   accessToken String
   userId      BigInt?
+}
+
+model charities {
+  id                     String    @id
+  website                String?
+  active                 Boolean?
+  created_at             DateTime? @db.Timestamptz(6)
+  name                   String?
+  address                Json?
+  hero_media             String?
+  social_media           Json?
+  mueshi_partner         Boolean?
+  email                  String?
+  bio                    String?
+  phone_number           String?
+  currently_raised       String?
+  revenue_share          BigInt?
+  goal                   BigInt?
+  user_id                String?
+  fundraiser_type        String?
+  organizer              String?
+  profile_media          Json?
+  hashtags               String?
+  category               String?
+  selected_charity       String?
+  beneficiary            String?
+  zip_code               String?
+  campaign_questionnaire Json?
+  organization           String?
 }
