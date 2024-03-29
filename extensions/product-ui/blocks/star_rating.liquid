@@ -1,0 +1,35 @@
+{% assign donation_percentage = shop.metafields.charity.donationPercentage | default: 0.03 %}
+{% assign foundation_name = shop.metafields.charity.selectedCharityNames | default: 'Shubham Sable Foundation' %}
+{% assign donation_amount = product.price | times: donation_percentage | money %}
+<div style="background-color: #BC2938; padding: 15px; text-align: center; margin-top: 20px;">
+  <p style="color: #F5F4E9;">
+    <strong>{{ donation_amount }}</strong> from your order will be donated towards:
+  </p>
+  <p style="color: #F5F4E9;">
+    Supporting community projects with <strong>{{ foundation_name }}</strong>
+  </p>
+</div>
+{% schema %}
+{
+  "name": "Donation Block",
+  "target": "section",
+  "settings": [
+    {
+      "type": "range",
+      "id": "donation_percentage",
+      "label": "Donation Percentage",
+      "min": 1,
+      "max": 100,
+      "default": 3,
+      "unit": "%",
+      "info": "Set the percentage of the purchase price that will be donated."
+    },
+    {
+      "type": "text",
+      "id": "foundation_name",
+      "label": "Foundation Name",
+      "default": "Shubham Sable Foundation"
+    }
+  ]
+}
+{% endschema %}
