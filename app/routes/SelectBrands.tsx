@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react'
 import {
   Text,
   ResourceList,
@@ -7,96 +7,157 @@ import {
   Card,
   Button,
   TextField,
-} from "@shopify/polaris";
+} from '@shopify/polaris'
+import { useLoaderData } from '@remix-run/react'
+import { MONTHLY_PLAN, authenticate } from '~/shopify.server'
+import axios from 'axios'
+import type { ResourceListProps } from '@shopify/polaris'
+import DonePage from './done'
+import useSubmitForm from '../../hooks/useSubmitForm'
 
-import type { ResourceListProps } from "@shopify/polaris";
+type Charity = {
+  id: string
+  name: string
+}
 
-import DonePage from "./done";
+type Product = {
+  id: string
+  title: string
+  image: any
+}
 
-function SelectBrands() {
-  // This state is now correctly placed inside the component
+type SelectBrandProps = {
+  charities: Charity[]
+  Product: Product[]
+  handleSubmitDoneForm: () => void
+}
+
+const SelectBrands: React.FC<SelectBrandProps> = ({
+  charities,
+  Product,
+  handleSubmitDoneForm,
+}) => {
+  console.log(Product)
+
+  const {
+    setSelectedCharityNames,
+    setDonationPercentage,
+    setSelectedProducts,
+    donationPercentage,
+    selectedCharityNames,
+    selectedProducts,
+  } = useSubmitForm()
 
   const [selectedItems, setSelectedItems] = useState<
-    ResourceListProps["selectedItems"]
-  >([]);
-  const [donationPercentage, setDonationPercentage] = useState("");
-  const [formSubmitted, setFormSubmitted] = useState(false);
-  const [selectedCharityNames, setSelectedCharityNames] = useState<string[]>(
-    []
-  );
+    ResourceListProps['selectedItems']
+  >([])
 
-  const handleSubmit = () => {
-    const selectedItemsArray = Array.isArray(selectedItems)
-      ? selectedItems
-      : [];
+  const [selectedProductItems, setSelectedProductItems] = useState<
+    ResourceListProps['selectedItems']
+  >([])
+
+  const [formSubmitted, setFormSubmitted] = useState(false)
+
+  const handleSubmit = async () => {
+    const selectedItemsArray = Array.isArray(selectedItems) ? selectedItems : []
+    const selectedProductsArray = Array.isArray(selectedProductItems)
+      ? selectedProductItems
+      : []
+
+    console.log('selectedProductsArray')
+    console.log(selectedProductsArray)
+
     const selectedNames = selectedItemsArray.map((selectedId) => {
-      const charity = items.find((item) => item.id === selectedId);
-      return charity ? charity.CharityName : "Unknown Charity";
-    });
+      const charity = items.find((item) => item.id === selectedId)
+      return {
+        name: charity?.name,
+        id: selectedId,
+      }
+    })
 
-    setSelectedCharityNames(selectedNames); // Update the selectedCharityNames state
-    console.log("Selected Charity Name(s):", selectedNames);
-    console.log("Donation Percentage:", donationPercentage);
-    setFormSubmitted(true);
-  };
+    const selectedProducts = selectedProductsArray.map((selectedId) => {
+      console.log(selectedId)
+      console.log('Product')
+      console.log(Product)
+
+      const prod = Product.find((item) => item.id === selectedId)
+      return {
+        title: prod?.title,
+        id: selectedId,
+        image: prod?.image,
+      }
+    })
+
+    setSelectedCharityNames(selectedNames as Charity[]) // Update the selectedCharityNames state
+    setSelectedProducts(selectedProducts as Product[])
+    setFormSubmitted(true)
+  }
 
   if (formSubmitted) {
     // This recursive call will cause an infinite loop.
     // Consider redirecting to another component or resetting form state instead.
+
     return (
       <DonePage
         selectedCharityNames={selectedCharityNames}
         donationPercentage={donationPercentage}
+        selectedProducts={selectedProducts}
+        handleSubmitDoneForm={handleSubmitDoneForm}
       />
-    );
+    )
   }
 
+  const items = charities
+
+  console.log(Product)
+
   const resourceName = {
-    singular: "charity",
-    plural: "charities",
-  };
+    singular: 'charity',
+    plural: 'charities',
+  }
 
-  const items = [
-    {
-      id: "101",
-      url: "#",
-      CharityName: "Red Cross Society",
-    },
-    {
-      id: "102",
-      url: "#",
-      CharityName: "Shubham Sable Foundation",
-    },
-    {
-      id: "103",
-      url: "#",
-      CharityName: "Blue Cross Foundation",
-    },
-    {
-      id: "104",
-      url: "#",
-      CharityName: "Hero for life",
-    },
-  ];
+  const ProductresourceName = {
+    singular: 'product',
+    plural: 'products',
+  }
 
-  function renderItem(item: (typeof items)[number]) {
-    const { id, url, CharityName } = item;
-    const media = <Avatar customer size="md" initials={CharityName[0]} />;
+  function renderItem(item: typeof items[number]) {
+    const { id, name } = item
+    console.log(item)
+
+    const media = <Avatar customer size="md" initials={name} />
 
     return (
       <ResourceItem
         id={id}
-        url={url}
+        url={''}
         media={media}
-        accessibilityLabel={`View details for ${CharityName}`}
+        accessibilityLabel={`View details for ${name}`}
       >
-        <h3>
-          <Text variant="bodyMd" fontWeight="bold" as="h3">
-            {CharityName}
-          </Text>
-        </h3>
+        <Text variant="bodyMd" fontWeight="bold" as="h3">
+          {name}
+        </Text>
       </ResourceItem>
-    );
+    )
+  }
+
+  function renderProductItem(item: typeof Product[number]) {
+    const { id, title, image } = item
+
+    const media = <Avatar customer size="md" initials={title} />
+
+    return (
+      <ResourceItem
+        id={id}
+        url={image.src}
+        media={media}
+        accessibilityLabel={`View details for ${title}`}
+      >
+        <Text variant="bodyMd" fontWeight="bold" as="h3">
+          {title}
+        </Text>
+      </ResourceItem>
+    )
   }
 
   return (
@@ -112,6 +173,15 @@ function SelectBrands() {
           onSelectionChange={setSelectedItems}
           selectable
         />
+
+        <ResourceList
+          resourceName={resourceName}
+          items={Product}
+          renderItem={renderProductItem}
+          selectedItems={selectedProductItems}
+          onSelectionChange={setSelectedProductItems}
+          selectable
+        />
       </Card>
       <Card>
         <TextField
@@ -123,14 +193,14 @@ function SelectBrands() {
           prefix="%"
           helpText="Specify the percentage of your purchase you wish to donate to charity."
         />
-        <div style={{ marginTop: "24px", textAlign: "center" }}>
+        <div style={{ marginTop: '24px', textAlign: 'center' }}>
           <Button onClick={handleSubmit} variant="primary">
             Next
           </Button>
         </div>
       </Card>
     </div>
-  );
+  )
 }
 
-export default SelectBrands;
+export default SelectBrands

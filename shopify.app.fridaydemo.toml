@@ -2,7 +2,7 @@
 
 name = "fridayDemo"
 client_id = "38d612ed01571c61aa9a5fbc1f8bea14"
-application_url = "https://texts-dv-mouse-drug.trycloudflare.com"
+application_url = "https://fears-refuse-televisions-rpm.trycloudflare.com"
 embedded = true
 
 [access_scopes]
@@ -11,9 +11,9 @@ scopes = "write_products,read_customers,write_customers"
 
 [auth]
 redirect_urls = [
-  "https://texts-dv-mouse-drug.trycloudflare.com/auth/callback",
-  "https://texts-dv-mouse-drug.trycloudflare.com/auth/shopify/callback",
-  "https://texts-dv-mouse-drug.trycloudflare.com/api/auth/callback"
+  "https://fears-refuse-televisions-rpm.trycloudflare.com/auth/callback",
+  "https://fears-refuse-televisions-rpm.trycloudflare.com/auth/shopify/callback",
+  "https://fears-refuse-televisions-rpm.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

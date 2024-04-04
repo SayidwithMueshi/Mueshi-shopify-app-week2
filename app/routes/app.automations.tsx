@@ -6,17 +6,7 @@ import {
   useLoaderData,
   useSubmit,
 } from '@remix-run/react'
-import {
-  Button,
-  Layout,
-  Page,
-  Text,
-  Card,
-  BlockStack,
-  Thumbnail,
-  TextContainer,
-  RangeSlider,
-} from '@shopify/polaris'
+import { Layout, Page, Text } from '@shopify/polaris'
 import React, { useCallback, useEffect, useState } from 'react'
 import VercelInviteUserEmail from '~/emails/custom'
 import { MONTHLY_PLAN, authenticate } from '~/shopify.server'

@@ -7,17 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Session {
-  id          String    @id
-  shop        String
-  state       String
-  isOnline    Boolean   @default(false)
-  scope       String?
-  expires     DateTime?
-  accessToken String
-  userId      BigInt?
-}
-
 model charities {
   id                     String    @id
   website                String?
@@ -32,8 +21,8 @@ model charities {
   bio                    String?
   phone_number           String?
   currently_raised       String?
-  revenue_share          BigInt?
-  goal                   BigInt?
+  revenue_share          Decimal?  @db.Decimal
+  goal                   Decimal?  @db.Decimal
   user_id                String?
   fundraiser_type        String?
   organizer              String?
@@ -45,4 +34,25 @@ model charities {
   zip_code               String?
   campaign_questionnaire Json?
   organization           String?
+}
+
+model Session {
+  id          String    @id @map("_id")
+  shop        String
+  state       String
+  isOnline    Boolean   @default(false)
+  scope       String?
+  expires     DateTime?
+  accessToken String
+  userId      BigInt?
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model results {
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  name       Json[]
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  charity_id String?  @db.Uuid
+  products   Json[]
+  percentage Decimal? @default(0) @db.Decimal
 }
